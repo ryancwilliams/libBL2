@@ -17,6 +17,8 @@
 package local.libBL2.sandbox;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 /**
@@ -29,15 +31,25 @@ public class FileReadSandbox {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        File file = chooseFile();
-        System.out.println(file.getPath());
+        try {
+            // TODO code application logic here
+            File file = chooseFile();
+            System.out.println(file.getPath());
+        } catch (Throwable ex) {
+            Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     
-    public static File chooseFile() {
+    public static File chooseFile() throws Throwable {
+        return chooseFile(true);
+    }
+    
+    private static final JFileChooser fileChooser = new JFileChooser();
+    
+    public static File chooseFile(boolean retry) throws Throwable {
         //Create the file chooser
-        JFileChooser fileChooser = new JFileChooser();
+        //done at class level
         
         //Prompt the user to select the file
         int returnVal = fileChooser.showOpenDialog(null);
@@ -48,7 +60,12 @@ public class FileReadSandbox {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             //If the file is selected
             file = fileChooser.getSelectedFile();
-        } 
+        } else if (retry == true) {
+            //If the file is not selected and retry is true
+            file = chooseFile(retry);
+        } else {
+            throw new Throwable("File was not selected.");
+        }
         
         return file;
     }
