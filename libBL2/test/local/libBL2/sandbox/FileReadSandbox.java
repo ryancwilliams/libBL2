@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -107,6 +109,11 @@ public class FileReadSandbox {
             //print the first 20 bytes
             System.out.println("Checksum: " + toHexString(checksum));
             
+            //Do the real hash
+            byte[] hash = computeHash(input);
+            //Print thr hash
+            System.out.println("SHA-1 Hash: " + toHexString(hash));
+            
             //Read the next 4 bytes
             byte[] uncompressedLength = read(input, 4);
             //Print the next 4 bytes
@@ -181,5 +188,35 @@ public class FileReadSandbox {
             }
         }
         return output;
+    }
+    
+    public static byte[] computeHash(InputStream input) throws IOException {
+        
+        //Mark the input stream
+        input.mark(Integer.MAX_VALUE);
+        
+        //Read the input stream
+        byte[] data = read(input, input.available());
+        
+        //compute the sha1 hash
+        byte[] hash = null;
+        try {
+            //Create the digest
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+            //reset the digest
+            sha1.reset();
+            //load the data
+            sha1.update(data);
+            //Get the hash
+            hash = sha1.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //reset the inputstream
+        input.reset();
+        
+        //Return the hash
+        return hash;
     }
 }
