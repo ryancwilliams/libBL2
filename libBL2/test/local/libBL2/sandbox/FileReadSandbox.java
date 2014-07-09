@@ -16,7 +16,12 @@
 
 package local.libBL2.sandbox;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -34,10 +39,10 @@ public class FileReadSandbox {
         try {
             // TODO code application logic here
             File file = chooseFile();
-            System.out.println(file.getPath());
+            readFile(file);
         } catch (Throwable ex) {
             Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         
     }
     
@@ -88,4 +93,93 @@ public class FileReadSandbox {
         return file;
     }
     
+    public static void readFile(File file) {
+        System.out.println("Path: " + file.getPath());
+        System.out.println("File size: " + file.length() + " bytes");
+
+        InputStream input = null;
+        try {
+            //Create the input stream
+            input = new BufferedInputStream(new FileInputStream(file));
+            
+            //Read the first 20 bytes
+            byte[] checksum = read(input, 20);  
+            //print the first 20 bytes
+            System.out.println("Checksum: " + toHexString(checksum));
+            
+            //Read the next 4 bytes
+            byte[] uncompressedLength = read(input, 4);
+            //Print the next 4 bytes
+            System.out.println("uncompressedLength: " + toHexString(uncompressedLength));
+            
+            //Read the rest of the file
+            byte[] payload = read(input, input.available());
+            //Print the payload
+            System.out.println("ADDRESS -------------------------------- PAYLOAD ---------------------------------");
+            System.out.println(toHexString(payload, true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            //Close the input stream
+            try {
+                input.close();
+            } catch (IOException ex) {
+                Logger.getLogger(FileReadSandbox.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public static byte[] read(InputStream input, int length) throws IOException {
+        byte[] data = new byte[length];
+        input.read(data);
+        return data;
+    }
+    
+    /**
+     * Converts the provided byte array to a readable string
+     * @param data the byte array to read
+     * @return the byte array as a string
+     */
+    public static String toHexString(byte[] data) {
+        return toHexString(data, false);
+    } 
+    
+    /**
+     * Converts the provided byte array to a readable string
+     * @param data the byte array to read
+     * @param showAddress TRUE if addresses should be shown on the left side
+     * @return the byte array as a string
+     */
+    public static String toHexString(byte[] data, boolean showAddress) {
+        String output = "";
+        int colCount = 0;
+        int rowCount = 0;
+        final int LINE_WIDTH = 24;
+        for(byte fragment : data) {
+            //Print address if first col
+            if (colCount == 0 && showAddress) {
+                //Create the address string
+                String address = String.format("%02X", LINE_WIDTH * rowCount);
+                //Pad the address string with 0
+                address = "0000".substring(address.length()) + address;
+                //Add the address to the output
+                output = output + "0x" + address + " ";
+            }
+            
+            //Add the byte to the string
+            output = output + " " + String.format("%02X", fragment);
+            
+            //Manage counter
+            colCount++;
+            if (colCount > LINE_WIDTH) {
+                //if LINE_WIDTH bytes on a line create a new line
+                output = output + "\n";
+                colCount = 0;
+                rowCount++;
+            }
+        }
+        return output;
+    }
 }
