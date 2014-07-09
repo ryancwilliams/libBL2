@@ -41,12 +41,30 @@ public class FileReadSandbox {
         
     }
     
+    /**
+     * Prompts the user to select a file.
+     * the user will NOT be prompted for the file again 
+     * if a file is not selected.
+     * @return The file selected by the user
+     * @throws Throwable Thrown if a file is not selected
+     */
     public static File chooseFile() throws Throwable {
-        return chooseFile(true);
+        return chooseFile(false);
     }
     
+    /**
+     * The file chooser for the choseFile functions. 
+     * Required for the choseFile functions to function.
+     */
     private static final JFileChooser fileChooser = new JFileChooser();
     
+    /**
+     * Prompts the user to select a file
+     * @param retry if TRUE then the user will be prompted for the file again 
+     * if a file is not selected. 
+     * @return The file selected by the user
+     * @throws Throwable Thrown if a file is not selected
+     */
     public static File chooseFile(boolean retry) throws Throwable {
         //Create the file chooser
         //done at class level
