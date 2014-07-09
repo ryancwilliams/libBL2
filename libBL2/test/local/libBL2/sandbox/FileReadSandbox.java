@@ -26,6 +26,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 import javax.swing.JFileChooser;
 
 /**
@@ -120,7 +122,9 @@ public class FileReadSandbox {
             System.out.println("uncompressedLength: " + toHexString(uncompressedLength));
             
             //Read the rest of the file
-            byte[] payload = read(input, input.available());
+            //FIXME fix the issue with LZO not working.
+            InputStream uncompressedInput = new InflaterInputStream(input);
+            byte[] payload = read(uncompressedInput, uncompressedInput.available());
             //Print the payload
             System.out.println("ADDRESS -------------------------------- PAYLOAD ---------------------------------");
             System.out.println(toHexString(payload, true));
