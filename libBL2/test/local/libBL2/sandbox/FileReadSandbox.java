@@ -26,9 +26,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
 import javax.swing.JFileChooser;
+import org.apache.hadoop.io.compress.BlockDecompressorStream;
+import org.apache.hadoop.io.compress.lzo.LzoDecompressor;
 
 /**
  *
@@ -123,7 +123,7 @@ public class FileReadSandbox {
             
             //Read the rest of the file
             //FIXME fix the issue with LZO not working.
-            InputStream uncompressedInput = new InflaterInputStream(input);
+            InputStream uncompressedInput = new BlockDecompressorStream(input, new LzoDecompressor());
             byte[] payload = read(uncompressedInput, uncompressedInput.available());
             //Print the payload
             System.out.println("ADDRESS -------------------------------- PAYLOAD ---------------------------------");

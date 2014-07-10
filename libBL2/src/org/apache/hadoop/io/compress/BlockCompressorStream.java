@@ -31,7 +31,7 @@ import java.io.OutputStream;
  * {@link org.apache.hadoop.io.compress.Compressor} requires buffering to
  * effect meaningful compression, it is responsible for it.
  */
-class BlockCompressorStream extends CompressorStream {
+public class BlockCompressorStream extends CompressorStream {
 
   // The 'maximum' size of input data to be compressed, to account
   // for the overhead of the compression algorithm.

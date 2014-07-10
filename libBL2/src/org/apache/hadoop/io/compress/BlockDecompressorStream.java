@@ -28,7 +28,7 @@ import java.io.InputStream;
  * 'stream-based' compression algorithms.
  *  
  */
-class BlockDecompressorStream extends DecompressorStream {
+public class BlockDecompressorStream extends DecompressorStream {
   private int originalBlockSize = 0;
   private int noUncompressedBytes = 0;
 
