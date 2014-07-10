@@ -1,3 +1,4 @@
 .DS_store
+/libBL2/build/
 /libBL2/nbproject/private/
 /libBL2/dist/
